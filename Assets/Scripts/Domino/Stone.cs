@@ -84,14 +84,19 @@ public class Stone : MonoBehaviour
     }
     public (Vector3 firstHalfPos, Vector3 secondHalfPos)  HalfsPositions()//получить позиции каждой половинки
     {
+        //Debug.Log(firstSprite.transform.position +"  "+ secondSprite.transform.position);
         return (firstSprite.transform.position, secondSprite.transform.position);
     }
     void Move()//функция, осуществляющая движение кости
     {
         {   if (isBeingDragged)
             {
-                var mp = Camera.main.ScreenToWorldPoint(Input.mousePosition);         
-                transform.position = mp;
+                var camera = GameCore.CurrentCamera();
+                //transform.position = mp;
+
+                var distance_to_screen = camera.WorldToScreenPoint(gameObject.transform.position).z;
+                var pos_move = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
+                transform.position = new Vector3(pos_move.x, pos_move.y, pos_move.z);
             }
             else
             {
@@ -99,7 +104,7 @@ public class Stone : MonoBehaviour
                 {
                     Rotate(1);
                 }
-                if (Vector3.Distance(anchorPoint, transform.localPosition) > 2)
+                if (Vector3.Distance(anchorPoint, transform.localPosition) > 0.01)
                 {
                     transform.localPosition = Vector3.Lerp(transform.localPosition, anchorPoint, speed * Time.deltaTime);
                 }
@@ -113,10 +118,33 @@ public class Stone : MonoBehaviour
         }
     }
 
-    bool IfCotainsMouse()//проверка на наличие курсора внутри кости
+    //bool IfCotainsMouse()//проверка на наличие курсора внутри кости
+    //{
+    //    var mp = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    //    return (GetComponent<BoxCollider2D>().bounds.Contains(mp));
+    //}
+
+    void OnMouseOver()
     {
-        var mp = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        return (GetComponent<BoxCollider2D>().bounds.Contains(mp));
+        if (Input.GetKeyDown(KeyCode.Mouse0) && isMovable && !GameCore.stoneBeingDragged)
+        {
+            isBeingDragged = true;
+            GameCore.stoneBeingDragged = true;
+            GameCore.draggedStone = this;
+            firstSprite.sortingOrder = 10;
+            secondSprite.sortingOrder = 10;
+        }
+        if (Input.GetKeyUp(KeyCode.Mouse0) && isMovable)
+        {
+            isBeingDragged = false;
+            firstSprite.sortingOrder = 5;
+            secondSprite.sortingOrder = 5;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Mouse1) && isBeingDragged && isMovable)
+        {
+            Rotate(1);
+        }
     }
 
     void Update()
@@ -129,28 +157,7 @@ public class Stone : MonoBehaviour
             isBeingDragged = false;
             return;
         }
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            if (IfCotainsMouse() && isMovable && !GameCore.stoneBeingDragged)
-            {
-                isBeingDragged = true;
-                GameCore.stoneBeingDragged = true;
-                GameCore.draggedStone = this;
-                firstSprite.sortingOrder = 10;
-                secondSprite.sortingOrder = 10;
-            }
-        }
-        if (Input.GetKeyUp(KeyCode.Mouse0) && isMovable)
-        {
-            isBeingDragged = false;
-            firstSprite.sortingOrder = 5;
-            secondSprite.sortingOrder = 5;
-        }
-
-        if(Input.GetKeyDown(KeyCode.Mouse1) && isBeingDragged && isMovable)
-        {
-            Rotate(1);
-        }
+       
 
     }
 }

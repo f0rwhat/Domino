@@ -42,7 +42,7 @@ public class Bot : PlayerBase
 
     }
     List<placeStruct> correctPlaces;
-    public Bot() : base(false, new Vector2(-200, 320))
+    public Bot() : base(false, new Vector2(-6.5f, 8f))
     {
         hand = new List<Stone>();
         correctPlaces = new List<placeStruct>();

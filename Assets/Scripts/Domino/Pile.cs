@@ -13,12 +13,12 @@ public class Pile
     }
     public void GeneratePile()//инициализация кучи
     {
-        GameObject canvas = GameObject.Find("Canvas");
+        //GameObject canvas = GameObject.Find("Canvas");
         for (byte i = 0; i <= 6; i++)
         {
             for (byte j = i; j <= 6; j++)
             {
-                Stone temp = Stone.Instantiate<Stone>(stonePrefab, new Vector3(0, 0, 0), stonePrefab.transform.rotation, canvas.transform);
+                Stone temp = Stone.Instantiate<Stone>(stonePrefab, new Vector3(0, 0, 0), stonePrefab.transform.rotation);
                 temp.Init(i, j);
                 pile.Insert(Random.Range(0, pile.Count), temp);
             }

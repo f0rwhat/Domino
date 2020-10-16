@@ -11,20 +11,21 @@ public class GameCore : MonoBehaviour
         TT_Player = 0,
         TT_Bot = 1
     }
-    static public int fieldHeight = 17
-                    , fieldWidth = 22;
-    const float verticalFieldX = -314.4f,
-               verticalFieldY = 224.7f,
-               horizontalFieldX = -299.4f,
-               horizontalFieldY = 239.7f,
-               stoneSize = 30f;
+    static public int fieldHeight = 12
+                    , fieldWidth = 16;
+    const float verticalFieldX = -7.5f,
+               verticalFieldY = 5f,
+               horizontalFieldX = -7f,
+               horizontalFieldY = 5.5f,
+               stoneSize = 1f;
     static public Pile stonesPile;
     static public Stone draggedStone;
     static public bool stoneBeingDragged = false;
     static public bool isGameOnPause;
     static public SpriteRenderer[,] fieldBlocks;
     static public int[,,] field;
-    
+    static public GameObject Camera2D, Camera3D;
+    static public bool is3DModeEnabled = true;
     Player player;
     Bot bot;
     static TurnType currentTurn = TurnType.TT_Player;
@@ -35,11 +36,14 @@ public class GameCore : MonoBehaviour
     void Start()
     {
         exitPanel = GameObject.Find("ExitPanel");
-        rulesPanel = GameObject.Find("RulesPanel");
+        //rulesPanel = GameObject.Find("RulesPanel");
         winText = GameObject.Find("WinText");
         looseText = GameObject.Find("LooseText");
+        Camera2D = GameObject.Find("2D Camera");
+        Camera3D = GameObject.Find("3D Camera");
+        Camera2D.SetActive(false);
         exitPanel.SetActive(false);
-        rulesPanel.SetActive(true);
+        //rulesPanel.SetActive(true);
         winText.SetActive(false);
         looseText.SetActive(false);
         isGameOnPause = false;
@@ -56,15 +60,15 @@ public class GameCore : MonoBehaviour
         winText.SetActive(false);
         looseText.SetActive(false);*/
 
-        GameObject canvas = GameObject.Find("Canvas");
+        //GameObject canvas = GameObject.Find("Canvas");
         StoneEffect stonePrefab = Resources.Load<StoneEffect>("Domino/Prefab/StoneEffect");
-        stoneEffect = StoneEffect.Instantiate(stonePrefab, canvas.transform);
+        stoneEffect = StoneEffect.Instantiate(stonePrefab, null);
         stoneEffect.Deploy();
-        stoneEffect.transform.localScale = new Vector3(30, 30, 0);
+        stoneEffect.transform.localScale = new Vector3(1, 1, 0);
         stoneEffect.SetRotationState(3);
 
         GameObject slotPrefab = Resources.Load<GameObject>("Domino/Prefab/Slot");
-        GameObject panel = GameObject.Find("Canvas/FirstStoneEffectPanel");
+        GameObject panel = GameObject.Find("FirstStoneEffectPanel");
         var stoneSprites = Resources.LoadAll<Sprite>("Domino/Sprites/txt_bones");
         fieldBlocks = new SpriteRenderer[fieldHeight, fieldWidth];
         field = new int[fieldHeight, fieldWidth, 2];
@@ -76,9 +80,9 @@ public class GameCore : MonoBehaviour
                 fieldBlocks[i, j] = slot.GetComponent<SpriteRenderer>();
                 fieldBlocks[i, j].sortingOrder = 1;
                 fieldBlocks[i, j].sprite = stoneSprites[0];
-                fieldBlocks[i, j].transform.localScale = new Vector3(30, 30, 0);
+                fieldBlocks[i, j].transform.localScale = new Vector3(1, 1, 0);
                 fieldBlocks[i, j].gameObject.SetActive(true);
-                fieldBlocks[i, j].color = new Color(0,0,0,0);
+                fieldBlocks[i, j].color = new Color(1,0,0,0);
                 field[i, j, 0] = -1;
                 field[i, j, 1] = 0;
             }
@@ -91,11 +95,11 @@ public class GameCore : MonoBehaviour
         stonesPile.GeneratePile();
 
         Stone firstStone = stonesPile.GetDual();
-        field[7, 10, 0] = -2;
-        field[8, 10, 0] = firstStone.Values().firstValue;
-        field[9, 10, 0] = -2;
-        field[8, 10, 1] = 0;
-        firstStone.SetNewAnchor(new Vector3(-314.4f + 10 * 30, 224.7f - 8 * 30 + 15, 0));
+        field[4, 7, 0] = -2;
+        field[5, 7, 0] = firstStone.Values().firstValue;
+        field[6, 7, 0] = -2;
+        field[5, 7, 1] = 0;
+        firstStone.SetNewAnchor(new Vector3(-0.5f, 0.5f, 0));
 
         for (int i = 0; i < 5; i++)
         {
@@ -548,6 +552,10 @@ public class GameCore : MonoBehaviour
                 break;
         }
     }
+    static public Camera CurrentCamera()
+    {
+        return (is3DModeEnabled ? Camera3D.GetComponent<Camera>() : Camera2D.GetComponent<Camera>());
+    }
     static Vector3 CalculateScreenPosition(bool dualPlacement, int rotationState, int connectorPart, int i1, int j1, int i2, int j2) //перевод из координат сетки в экранные координаты
     {
         if (dualPlacement)
@@ -570,10 +578,10 @@ public class GameCore : MonoBehaviour
                     switch (connectorPart)
                     {
                         case 1:
-                            return new Vector3(horizontalFieldX + j1 * stoneSize - 15, horizontalFieldY - i1 * stoneSize, 0);
+                            return new Vector3(horizontalFieldX + j1 * stoneSize - stoneSize / 2, horizontalFieldY - i1 * stoneSize, 0);
                             break;
                         case 2:
-                            return new Vector3(horizontalFieldX + j1 * stoneSize + 15, horizontalFieldY - i1 * stoneSize, 0);
+                            return new Vector3(horizontalFieldX + j1 * stoneSize + stoneSize / 2, horizontalFieldY - i1 * stoneSize, 0);
                             break;
                     }
 
@@ -593,10 +601,10 @@ public class GameCore : MonoBehaviour
                     switch (connectorPart)
                     {
                         case 1:
-                            return new Vector3(horizontalFieldX + j2 * stoneSize + 15, horizontalFieldY - i2 * stoneSize, 0);
+                            return new Vector3(horizontalFieldX + j2 * stoneSize + stoneSize / 2, horizontalFieldY - i2 * stoneSize, 0);
                             break;
                         case 2:
-                            return new Vector3(horizontalFieldX + j2 * stoneSize - 15, horizontalFieldY - i2 * stoneSize, 0);
+                            return new Vector3(horizontalFieldX + j2 * stoneSize - stoneSize / 2, horizontalFieldY - i2 * stoneSize, 0);
                             break;
                     }
 
@@ -707,12 +715,18 @@ public class GameCore : MonoBehaviour
         {
             EndGame(0);
         }
-        if (Input.anyKeyDown && rulesPanel.activeSelf)
-        {
-            rulesPanel.SetActive(false);
-            isGameOnPause = false;
-            return;
-        }
+        //if (Input.GetKeyDown("CameraSwitch"))
+        //{
+        //    is3DModeEnabled = !is3DModeEnabled;
+        //    Camera2D.SetActive(!is3DModeEnabled);
+        //    Camera3D.SetActive(is3DModeEnabled);
+        //}
+        //if (Input.anyKeyDown && rulesPanel.activeSelf)
+        //{
+        //    rulesPanel.SetActive(false);
+        //    isGameOnPause = false;
+        //    return;
+        //}
         if (!exitPanel.activeSelf)
             isGameOnPause = false;
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -740,11 +754,13 @@ public class GameCore : MonoBehaviour
                 {
                     if (fieldBlocks[i, j].bounds.Contains(halfsPositions.firstHalfPos) && field[i, j, 0] == -1)
                     {
+                        Debug.Log("First containts:"+i+"-"+j);
                         i1 = i;
                         j1 = j;
                     }
                     if (fieldBlocks[i, j].bounds.Contains(halfsPositions.secondHalfPos) && field[i, j, 0] == -1)
                     {
+                        Debug.Log("Second containts:" + i+"-" + j);
                         i2 = i;
                         j2 = j;
                     }
@@ -753,6 +769,7 @@ public class GameCore : MonoBehaviour
             var checkResult = IfCanBePlaced(i1, j1, draggedStone.Values().firstValue, i2, j2, draggedStone.Values().secondValue); //проверка на возможность расположения кости
             if (checkResult.canBePlaced) //если можно, то отображаем подсветку
             {
+                Debug.Log("Can be placed:"+ CalculateScreenPosition(checkResult.dualPlacement, draggedStone.GetRotationState(), checkResult.connectorPart, i1, j1, i2, j2));
                 Vector3 placementPosition = CalculateScreenPosition(checkResult.dualPlacement, draggedStone.GetRotationState(), checkResult.connectorPart, i1, j1, i2, j2);
                 stoneEffect.SetRotationState(draggedStone.GetRotationState());
                 stoneEffect.transform.localPosition = placementPosition;

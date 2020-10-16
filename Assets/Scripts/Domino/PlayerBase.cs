@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class PlayerBase//базовый класс для Player и Bot
 {
-    public const int maxStonesCount = 14;
-    const int stonesSpacing = 31;
+    public const int maxStonesCount = 16;
+    const int stonesSpacing = 1;
     protected List<Stone> hand;
     protected Vector2 handPos;
     bool areStonesMovable;
