@@ -51,7 +51,7 @@ public class Stone : MonoBehaviour
     public void SetNewAnchor(Vector3 newAnchor)//установка позиции, к которой будет стремится кость после взаимодействия
     {
         //Debug.Log("Anchor set:"+newAnchor.x+" " + newAnchor.y + " " + newAnchor.z);
-        newAnchor.z = 1;
+        newAnchor.z = 0.77f;
         anchorPoint = newAnchor;
     }
 

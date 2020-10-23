@@ -17,25 +17,29 @@ public class PlayerBase//базовый класс для Player и Bot
         areStonesMovable = _areStonesMovable;
         handPos = _handPos;
     }
-
+    void ShiftStones()
+    {
+        
+        Vector3 pos = new Vector3(-(float)hand.Count / 2 + 0.5f,handPos.y);
+        for (int i = 0; i < hand.Count; i++)
+        {
+            hand[i].SetNewAnchor(pos);
+            pos.x += stonesSpacing;
+        }
+    }
     public void PickStone()//взять кость в руку
     {
         Stone newStone = GameCore.stonesPile.GetStone();
-        Vector3 pos = new Vector3(handPos.x + stonesSpacing * hand.Count, handPos.y, 0);
-        newStone.SetNewAnchor(pos);
         newStone.Deploy(areStonesMovable);
         hand.Add(newStone);
+        ShiftStones();
     }
 
     public void DropStone(Stone stone)//удалить кость из руки
     {
         stone.MakeUnmovable();
         hand.Remove(stone);
-        for (int i = 0; i < hand.Count; i++)
-        {
-            Vector3 pos = new Vector3(handPos.x + stonesSpacing * i, handPos.y, 0);
-            hand[i].SetNewAnchor(pos);
-        }
+        ShiftStones();
     }
 
     public bool HasStoneWithValue(int value)//проверка на наличие костей с таким значением

@@ -567,10 +567,10 @@ public class GameCore : MonoBehaviour
                     switch (connectorPart)
                     {
                         case 1:
-                            return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize + stoneSize/2, 1);
+                            return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize + stoneSize/2, 0.77f);
                             break;
                         case 2:
-                            return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize - stoneSize/2, 1);
+                            return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize - stoneSize/2, 0.77f);
                             break;
                     }
 
@@ -579,10 +579,10 @@ public class GameCore : MonoBehaviour
                     switch (connectorPart)
                     {
                         case 1:
-                            return new Vector3(horizontalFieldX + j1 * stoneSize - stoneSize / 2, horizontalFieldY - i1 * stoneSize, 1);
+                            return new Vector3(horizontalFieldX + j1 * stoneSize - stoneSize / 2, horizontalFieldY - i1 * stoneSize, 0.77f);
                             break;
                         case 2:
-                            return new Vector3(horizontalFieldX + j1 * stoneSize + stoneSize / 2, horizontalFieldY - i1 * stoneSize, 1);
+                            return new Vector3(horizontalFieldX + j1 * stoneSize + stoneSize / 2, horizontalFieldY - i1 * stoneSize, 0.77f);
                             break;
                     }
 
@@ -591,10 +591,10 @@ public class GameCore : MonoBehaviour
                     switch (connectorPart)
                     {
                         case 1:
-                            return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize - stoneSize/2, 1);
+                            return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize - stoneSize/2, 0.77f);
                             break;
                         case 2:
-                            return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize + stoneSize/2, 1);
+                            return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize + stoneSize/2, 0.77f);
                             break;
                     }
                     break;
@@ -602,10 +602,10 @@ public class GameCore : MonoBehaviour
                     switch (connectorPart)
                     {
                         case 1:
-                            return new Vector3(horizontalFieldX + j2 * stoneSize + stoneSize / 2, horizontalFieldY - i2 * stoneSize, 1);
+                            return new Vector3(horizontalFieldX + j2 * stoneSize + stoneSize / 2, horizontalFieldY - i2 * stoneSize, 0.77f);
                             break;
                         case 2:
-                            return new Vector3(horizontalFieldX + j2 * stoneSize - stoneSize / 2, horizontalFieldY - i2 * stoneSize, 1);
+                            return new Vector3(horizontalFieldX + j2 * stoneSize - stoneSize / 2, horizontalFieldY - i2 * stoneSize, 0.77f);
                             break;
                     }
 
@@ -617,16 +617,16 @@ public class GameCore : MonoBehaviour
             switch (rotationState)
             {
                 case 0:
-                    return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize, 1);
+                    return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize, 0.77f);
                     break;
                 case 1:
-                    return new Vector3(horizontalFieldX + j1 * stoneSize, horizontalFieldY - i1 * stoneSize, 1);
+                    return new Vector3(horizontalFieldX + j1 * stoneSize, horizontalFieldY - i1 * stoneSize, 0.77f);
                     break;
                 case 2:
-                    return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize, 1);
+                    return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize, 0.77f);
                     break;
                 case 3:
-                    return new Vector3(horizontalFieldX + j2 * stoneSize, horizontalFieldY - i2 * stoneSize, 1);
+                    return new Vector3(horizontalFieldX + j2 * stoneSize, horizontalFieldY - i2 * stoneSize, 0.77f);
                     break;
             }
         }
@@ -752,13 +752,11 @@ public class GameCore : MonoBehaviour
                 {
                     if (fieldBlocks[i, j].bounds.Contains(halfsPositions.firstHalfPos) && field[i, j, 0] == -1)
                     {
-                        Debug.Log("First containts:"+i+"-"+j);
                         i1 = i;
                         j1 = j;
                     }
                     if (fieldBlocks[i, j].bounds.Contains(halfsPositions.secondHalfPos) && field[i, j, 0] == -1)
                     {
-                        Debug.Log("Second containts:" + i+"-" + j);
                         i2 = i;
                         j2 = j;
                     }
@@ -767,7 +765,6 @@ public class GameCore : MonoBehaviour
             var checkResult = IfCanBePlaced(i1, j1, draggedStone.Values().firstValue, i2, j2, draggedStone.Values().secondValue); //проверка на возможность расположения кости
             if (checkResult.canBePlaced) //если можно, то отображаем подсветку
             {
-                Debug.Log("Can be placed:"+ CalculateScreenPosition(checkResult.dualPlacement, draggedStone.GetRotationState(), checkResult.connectorPart, i1, j1, i2, j2));
                 Vector3 placementPosition = CalculateScreenPosition(checkResult.dualPlacement, draggedStone.GetRotationState(), checkResult.connectorPart, i1, j1, i2, j2);
                 stoneEffect.SetRotationState(draggedStone.GetRotationState());
                 stoneEffect.transform.localPosition = placementPosition;
