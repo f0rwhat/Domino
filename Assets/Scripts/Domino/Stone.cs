@@ -51,6 +51,7 @@ public class Stone : MonoBehaviour
     public void SetNewAnchor(Vector3 newAnchor)//установка позиции, к которой будет стремится кость после взаимодействия
     {
         //Debug.Log("Anchor set:"+newAnchor.x+" " + newAnchor.y + " " + newAnchor.z);
+        newAnchor.z = 1;
         anchorPoint = newAnchor;
     }
 
@@ -96,7 +97,7 @@ public class Stone : MonoBehaviour
 
                 var distance_to_screen = camera.WorldToScreenPoint(gameObject.transform.position).z;
                 var pos_move = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
-                transform.position = new Vector3(pos_move.x, pos_move.y, pos_move.z);
+                transform.position = new Vector3(pos_move.x, pos_move.y, 0.5f);
             }
             else
             {

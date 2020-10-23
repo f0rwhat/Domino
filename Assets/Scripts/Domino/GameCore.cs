@@ -25,7 +25,7 @@ public class GameCore : MonoBehaviour
     static public SpriteRenderer[,] fieldBlocks;
     static public int[,,] field;
     static public GameObject Camera2D, Camera3D;
-    static public bool is3DModeEnabled = true;
+    static public bool is3DModeEnabled = true, cameraRotationEnabled = true;
     Player player;
     Bot bot;
     static TurnType currentTurn = TurnType.TT_Player;
@@ -42,6 +42,7 @@ public class GameCore : MonoBehaviour
         Camera2D = GameObject.Find("2D Camera");
         Camera3D = GameObject.Find("3D Camera");
         Camera2D.SetActive(false);
+        Camera3D.SetActive(true);
         exitPanel.SetActive(false);
         //rulesPanel.SetActive(true);
         winText.SetActive(false);
@@ -566,10 +567,10 @@ public class GameCore : MonoBehaviour
                     switch (connectorPart)
                     {
                         case 1:
-                            return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize + stoneSize/2, 0);
+                            return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize + stoneSize/2, 1);
                             break;
                         case 2:
-                            return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize - stoneSize/2, 0);
+                            return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize - stoneSize/2, 1);
                             break;
                     }
 
@@ -578,10 +579,10 @@ public class GameCore : MonoBehaviour
                     switch (connectorPart)
                     {
                         case 1:
-                            return new Vector3(horizontalFieldX + j1 * stoneSize - stoneSize / 2, horizontalFieldY - i1 * stoneSize, 0);
+                            return new Vector3(horizontalFieldX + j1 * stoneSize - stoneSize / 2, horizontalFieldY - i1 * stoneSize, 1);
                             break;
                         case 2:
-                            return new Vector3(horizontalFieldX + j1 * stoneSize + stoneSize / 2, horizontalFieldY - i1 * stoneSize, 0);
+                            return new Vector3(horizontalFieldX + j1 * stoneSize + stoneSize / 2, horizontalFieldY - i1 * stoneSize, 1);
                             break;
                     }
 
@@ -590,10 +591,10 @@ public class GameCore : MonoBehaviour
                     switch (connectorPart)
                     {
                         case 1:
-                            return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize - stoneSize/2, 0);
+                            return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize - stoneSize/2, 1);
                             break;
                         case 2:
-                            return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize + stoneSize/2, 0);
+                            return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize + stoneSize/2, 1);
                             break;
                     }
                     break;
@@ -601,10 +602,10 @@ public class GameCore : MonoBehaviour
                     switch (connectorPart)
                     {
                         case 1:
-                            return new Vector3(horizontalFieldX + j2 * stoneSize + stoneSize / 2, horizontalFieldY - i2 * stoneSize, 0);
+                            return new Vector3(horizontalFieldX + j2 * stoneSize + stoneSize / 2, horizontalFieldY - i2 * stoneSize, 1);
                             break;
                         case 2:
-                            return new Vector3(horizontalFieldX + j2 * stoneSize - stoneSize / 2, horizontalFieldY - i2 * stoneSize, 0);
+                            return new Vector3(horizontalFieldX + j2 * stoneSize - stoneSize / 2, horizontalFieldY - i2 * stoneSize, 1);
                             break;
                     }
 
@@ -616,16 +617,16 @@ public class GameCore : MonoBehaviour
             switch (rotationState)
             {
                 case 0:
-                    return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize, 0);
+                    return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize, 1);
                     break;
                 case 1:
-                    return new Vector3(horizontalFieldX + j1 * stoneSize, horizontalFieldY - i1 * stoneSize, 0);
+                    return new Vector3(horizontalFieldX + j1 * stoneSize, horizontalFieldY - i1 * stoneSize, 1);
                     break;
                 case 2:
-                    return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize, 0);
+                    return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize, 1);
                     break;
                 case 3:
-                    return new Vector3(horizontalFieldX + j2 * stoneSize, horizontalFieldY - i2 * stoneSize, 0);
+                    return new Vector3(horizontalFieldX + j2 * stoneSize, horizontalFieldY - i2 * stoneSize, 1);
                     break;
             }
         }
@@ -715,18 +716,12 @@ public class GameCore : MonoBehaviour
         {
             EndGame(0);
         }
-        //if (Input.GetKeyDown("CameraSwitch"))
-        //{
-        //    is3DModeEnabled = !is3DModeEnabled;
-        //    Camera2D.SetActive(!is3DModeEnabled);
-        //    Camera3D.SetActive(is3DModeEnabled);
-        //}
-        //if (Input.anyKeyDown && rulesPanel.activeSelf)
-        //{
-        //    rulesPanel.SetActive(false);
-        //    isGameOnPause = false;
-        //    return;
-        //}
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            is3DModeEnabled = !is3DModeEnabled;
+            Camera2D.SetActive(!is3DModeEnabled);
+            Camera3D.SetActive(is3DModeEnabled);
+        }
         if (!exitPanel.activeSelf)
             isGameOnPause = false;
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -743,7 +738,10 @@ public class GameCore : MonoBehaviour
                 return;
             }
         }
-        
+        if ((Input.GetKeyDown(KeyCode.Mouse1) && !stoneBeingDragged && is3DModeEnabled))
+        {
+            cameraRotationEnabled = true;
+        }
         if (stoneBeingDragged) 
         {
             int i1 = -1, i2 = -1, j1 = -1, j2 = -1;
