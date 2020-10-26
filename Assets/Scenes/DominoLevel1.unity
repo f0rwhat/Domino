@@ -528,25 +528,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &549066230 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6880843420933775451, guid: fdfb8672b2cb1544daffb8b785a7e6ba,
-    type: 3}
-  m_PrefabInstance: {fileID: 1503996239}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &549066233
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 549066230}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9b8563e4c10bbc4ca7203d04de6fa92, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 5
 --- !u!1 &615833097
 GameObject:
   m_ObjectHideFlags: 0
@@ -714,24 +695,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 677409987}
   m_CullTransparentMesh: 0
---- !u!1 &678454211 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8361233315502225474, guid: ecdc007ebb20e06459094c6067e96367,
-    type: 3}
-  m_PrefabInstance: {fileID: 3131334092983806394}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &678454212
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 678454211}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 196556493fca9224b9da2c30a94d13c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &830385845 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7535274417563605038, guid: d3067d010a1473247b21e9ab3a9bb861,
@@ -1328,8 +1291,7 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 7487693101517291562, guid: fdfb8672b2cb1544daffb8b785a7e6ba, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fdfb8672b2cb1544daffb8b785a7e6ba, type: 3}
 --- !u!1 &1674750364
 GameObject:
@@ -1641,6 +1603,5 @@ PrefabInstance:
       propertyPath: m_Name
       value: StoneEffect
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 3131334091509372956, guid: ecdc007ebb20e06459094c6067e96367, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ecdc007ebb20e06459094c6067e96367, type: 3}

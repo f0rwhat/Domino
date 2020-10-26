@@ -5570,3 +5570,260 @@ Bot has stone to move:True
 Player has stone to move:True
 AnyMovesAvailable check end:True
 PLAYER WINS
+AnyMovesAvailable check
+Anchor check:
+Left Left confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+AnyMovesAvailable check
+Anchor check:
+Left Left confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+AnyMovesAvailable check
+Anchor check:
+Left Left confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+AnyMovesAvailable check
+Anchor check:
+Left Left confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+AnyMovesAvailable check
+Anchor check:
+Left Left confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+AnyMovesAvailable check
+Anchor check:
+Left Left confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+AnyMovesAvailable check
+Anchor check:
+Left Left confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+AnyMovesAvailable check
+Anchor check:
+Left Left confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+AnyMovesAvailable check
+Anchor check:
+Top Top confirmed
+Anchor check:
+Right Right confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Bot
+MAKETURN START
+FirstAnchor::5-5
+SecondAnchor::5-7
+Bot placed stone
+BOT TURN END
+AnyMovesAvailable check
+Anchor check:
+Right Right confirmed
+Anchor check:
+Left Left confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Player
+AnyMovesAvailable check
+Anchor check:
+Right Right confirmed
+Anchor check:
+Bot Bot confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Bot
+MAKETURN START
+FirstAnchor::5-7
+SecondAnchor::7-5
+Bot placed stone
+BOT TURN END
+AnyMovesAvailable check
+Anchor check:
+Top Top confirmed
+Anchor check:
+Bot Bot confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Player
+AnyMovesAvailable check
+Anchor check:
+Top Top confirmed
+Anchor check:
+Bot Bot confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+AnyMovesAvailable check
+Anchor check:
+Right Right confirmed
+Anchor check:
+Bot Bot confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Bot
+MAKETURN START
+FirstAnchor::5-10
+SecondAnchor::7-5
+Bot placed stone
+BOT TURN END
+AnyMovesAvailable check
+Anchor check:
+Bot Bot confirmed
+Anchor check:
+Bot Bot confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Player
+AnyMovesAvailable check
+Anchor check:
+Top Top confirmed
+Anchor check:
+Bot Bot confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Bot
+MAKETURN START
+FirstAnchor::6-13
+SecondAnchor::7-5
+Bot placed stone
+BOT TURN END
+AnyMovesAvailable check
+Anchor check:
+Top Top confirmed
+Anchor check:
+Bot Bot confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Player
+AnyMovesAvailable check
+Anchor check:
+Top Top confirmed
+Anchor check:
+Bot Bot confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+AnyMovesAvailable check
+Anchor check:
+Top Top confirmed
+Anchor check:
+Left Left confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Bot
+MAKETURN START
+FirstAnchor::4-13
+SecondAnchor::9-5
+Bot placed stone
+BOT TURN END
+AnyMovesAvailable check
+Anchor check:
+Top Top confirmed
+Anchor check:
+Left Left confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Player
+AnyMovesAvailable check
+Anchor check:
+Top Top confirmed
+Anchor check:
+Top Top confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Bot
+MAKETURN START
+FirstAnchor::3-12
+SecondAnchor::9-7
+Bot placed stone
+BOT TURN END
+AnyMovesAvailable check
+Anchor check:
+Top Left confirmed
+Anchor check:
+Top Top confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Player
+AnyMovesAvailable check
+Anchor check:
+Top Left confirmed
+Anchor check:
+Top Top confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+PLAYER WINS
+AnyMovesAvailable check
+Anchor check:
+Left Left confirmed
+Anchor check:
+Top Top confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Bot
+MAKETURN START
+FirstAnchor::5-7
+SecondAnchor::5-9
+Bot placed stone
+BOT TURN END
+AnyMovesAvailable check
+Anchor check:
+Top Top confirmed
+Anchor check:
+Top Top confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Player
+AnyMovesAvailable check
+Anchor check:
+Top Top confirmed
+Anchor check:
+Left Left confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Bot
+MAKETURN START
+FirstAnchor::5-5
+SecondAnchor::7-9
+Bot placed stone
+BOT TURN END
+AnyMovesAvailable check
+Anchor check:
+Top Top confirmed
+Anchor check:
+Left Left confirmed
+Bot has stone to move:True
+Player has stone to move:True
+AnyMovesAvailable check end:True
+Switching turn to Player

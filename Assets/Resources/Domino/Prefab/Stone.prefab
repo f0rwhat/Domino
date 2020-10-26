@@ -290,9 +290,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9070552903566174594}
-  - component: {fileID: 7487693101517291562}
   - component: {fileID: 4224048134431294605}
   - component: {fileID: 2124586604460670172}
+  - component: {fileID: 2527952785528654726}
   m_Layer: 0
   m_Name: Stone
   m_TagString: Untagged
@@ -317,19 +317,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7487693101517291562
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6880843420933775451}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9b8563e4c10bbc4ca7203d04de6fa92, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 5
 --- !u!50 &4224048134431294605
 Rigidbody2D:
   serializedVersion: 4
@@ -377,3 +364,16 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.0001569, y: 2.0075707}
   m_EdgeRadius: 0
+--- !u!114 &2527952785528654726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6880843420933775451}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9b8563e4c10bbc4ca7203d04de6fa92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 5
