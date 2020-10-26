@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pile
+public class Pile: MonoBehaviour
 {
     private Stone stonePrefab;
     private List<Stone> pile = new List<Stone>();
 
     public Pile()
+    {
+    }
+    void Start()
     {
         stonePrefab = Resources.Load<Stone>("Domino/Prefab/Stone");
     }

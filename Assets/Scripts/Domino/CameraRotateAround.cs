@@ -14,18 +14,19 @@ public class CameraRotateAround : MonoBehaviour
 	public float zoomMin = 3; // мин. увеличение
 	private float X, Y;
 	private bool isCameraRotationEnabled = false;
+	private GameCore gameCore;
 
 	void Start()
 	{
+		gameCore = GameObject.Find("GameCore").GetComponent<GameCore>();
 		limit = Mathf.Abs(limit);
 		if (limit > 90) limit = 90;
 		offset = new Vector3(offset.x, offset.y, -Mathf.Abs(zoomMax) / 2);
-		//transform.position = target.position + offset;
 	}
 
 	void Update()
 	{
-		if (Input.GetKeyDown(KeyCode.Mouse1) && !GameCore.stoneBeingDragged)
+		if (Input.GetKeyDown(KeyCode.Mouse1) && !gameCore.stoneBeingDragged)
 		{
 			isCameraRotationEnabled = true;
 		}

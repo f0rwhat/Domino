@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBase//базовый класс для Player и Bot
+public class PlayerBase:MonoBehaviour//базовый класс для Player и Bot
 {
     public const int maxStonesCount = 16;
-    const int stonesSpacing = 1;
+    private const int stonesSpacing = 1;
+    private bool areStonesMovable;
+    protected Pile pile;
     protected List<Stone> hand;
     protected Vector2 handPos;
-    bool areStonesMovable;
     
 
     public PlayerBase(bool _areStonesMovable, Vector2 _handPos)
@@ -16,6 +17,10 @@ public class PlayerBase//базовый класс для Player и Bot
         hand = new List<Stone>();
         areStonesMovable = _areStonesMovable;
         handPos = _handPos;
+    }
+    protected void Start()
+    {
+        pile = GameObject.Find("Pile").GetComponent<Pile>();
     }
     void ShiftStones()
     {
@@ -29,7 +34,7 @@ public class PlayerBase//базовый класс для Player и Bot
     }
     public void PickStone()//взять кость в руку
     {
-        Stone newStone = GameCore.stonesPile.GetStone();
+        Stone newStone = pile.GetStone();
         newStone.Deploy(areStonesMovable);
         hand.Add(newStone);
         ShiftStones();

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Bot : PlayerBase
 {
-    struct checkStruct
+    private struct checkStruct
     {
         public Vector2 place { get; set; }
         public int stoneIndex { get; set; }
@@ -18,7 +18,7 @@ public class Bot : PlayerBase
         }
         
     }
-    struct placeStruct
+    private struct placeStruct
     {
         public int i1 { get; set; }
         public int j1 { get; set; }
@@ -41,21 +41,26 @@ public class Bot : PlayerBase
         }
 
     }
-    List<placeStruct> correctPlaces;
+    private List<placeStruct> correctPlaces;
+    private GameCore gameCore;
     public Bot() : base(false, new Vector2(-6.5f, 8f))
     {
         hand = new List<Stone>();
         correctPlaces = new List<placeStruct>();
     }
-
+    new void Start()
+    {
+        gameCore = GameObject.Find("GameCore").GetComponent<GameCore>();
+        base.Start();
+    }
     (bool canBePlaced, bool dualPlacement, Vector2 anchor, int connectorPart) TryPlace(int i1,int j1, int firstValue, int i2, int j2, int secondValue, int stoneIndex)
     {
         Vector2 anchor = new Vector2();
-        if (i1 < 0 || i1 >= GameCore.fieldHeight || i2 < 0 || i2 >= GameCore.fieldHeight || j1 < 0 || j1 >= GameCore.fieldWidth || j2 < 0 || j2 >= GameCore.fieldWidth) 
+        if (i1 < 0 || i1 >= gameCore.fieldHeight || i2 < 0 || i2 >= gameCore.fieldHeight || j1 < 0 || j1 >= gameCore.fieldWidth || j2 < 0 || j2 >= gameCore.fieldWidth) 
             return (false, false, anchor, 0);
-        if (GameCore.field[i1, j1, 0] != -1 || GameCore.field[i2, j2, 0] != -1)
+        if (gameCore.field[i1, j1, 0] != -1 || gameCore.field[i2, j2, 0] != -1)
             return (false, false, anchor, 0);
-        var result = GameCore.IfCanBePlaced(i1, j1, firstValue, i2, j2, secondValue);
+        var result = gameCore.IfCanBePlaced(i1, j1, firstValue, i2, j2, secondValue);
         if (result.canBePlaced)
         {
             correctPlaces.Add(new placeStruct(i1, j1, i2, j2, result.anchor, result.connectorPart, result.dualPlacement, stoneIndex));
@@ -65,28 +70,28 @@ public class Bot : PlayerBase
 
     public void MakeTurn()//основная функция бота
     {
-        GameCore.WriteLog("MAKETURN START");
+        gameCore.WriteLog("MAKETURN START");
         Vector2 firstAnchor = new Vector2(-1, -1), secondAnchor = new Vector2(-1, -1);
         int[,,] placementChecks;
         List<checkStruct> placebleStones = new List<checkStruct>();
         correctPlaces.Clear();
-        for (int i = 0; i < GameCore.fieldHeight; i++)//поиск краев в цепи
+        for (int i = 0; i < gameCore.fieldHeight; i++)//поиск краев в цепи
         {
-            for (int j = 0; j < GameCore.fieldWidth && secondAnchor == new Vector2(-1, -1); j++)
+            for (int j = 0; j < gameCore.fieldWidth && secondAnchor == new Vector2(-1, -1); j++)
             {
-                if (GameCore.field[i, j, 0] > -1 && GameCore.field[i, j, 1] < 2)
+                if (gameCore.field[i, j, 0] > -1 && gameCore.field[i, j, 1] < 2)
                 {
                     if (firstAnchor == new Vector2(-1, -1)) firstAnchor = new Vector2(j, i);
                     else secondAnchor = new Vector2(j, i);
                 }
             }
         }
-        GameCore.WriteLog("FirstAnchor::" + firstAnchor.y + "-" + firstAnchor.x);
-        GameCore.WriteLog("SecondAnchor::" + secondAnchor.y + "-" + secondAnchor.x);
+        gameCore.WriteLog("FirstAnchor::" + firstAnchor.y + "-" + firstAnchor.x);
+        gameCore.WriteLog("SecondAnchor::" + secondAnchor.y + "-" + secondAnchor.x);
         if (firstAnchor == new Vector2(-1, -1) && secondAnchor == new Vector2(-1, -1))
         {
-            GameCore.WriteLog("No anchors found");
-            GameCore.WriteLog("BOT TURN END");
+            gameCore.WriteLog("No anchors found");
+            gameCore.WriteLog("BOT TURN END");
             return;
         }
 
@@ -94,16 +99,16 @@ public class Bot : PlayerBase
         {
             if (firstAnchor != new Vector2(-1, -1))
             {
-                if (hand[c].Values().firstValue == GameCore.field[(int)firstAnchor.y, (int)firstAnchor.x, 0])
+                if (hand[c].Values().firstValue == gameCore.field[(int)firstAnchor.y, (int)firstAnchor.x, 0])
                     placebleStones.Add(new checkStruct(firstAnchor, c, 1));
-                else if (hand[c].Values().secondValue == GameCore.field[(int)firstAnchor.y, (int)firstAnchor.x, 0])
+                else if (hand[c].Values().secondValue == gameCore.field[(int)firstAnchor.y, (int)firstAnchor.x, 0])
                     placebleStones.Add(new checkStruct(firstAnchor, c, 2));
             }
             if (secondAnchor != new Vector2(-1, -1))
             {
-                if (hand[c].Values().firstValue == GameCore.field[(int)secondAnchor.y, (int)secondAnchor.x, 0])
+                if (hand[c].Values().firstValue == gameCore.field[(int)secondAnchor.y, (int)secondAnchor.x, 0])
                     placebleStones.Add(new checkStruct(secondAnchor, c, 1));
-                else if (hand[c].Values().secondValue == GameCore.field[(int)secondAnchor.y, (int)secondAnchor.x, 0])
+                else if (hand[c].Values().secondValue == gameCore.field[(int)secondAnchor.y, (int)secondAnchor.x, 0])
                     placebleStones.Add(new checkStruct(secondAnchor, c, 2));
             }
             if (c==hand.Count-1)
@@ -252,12 +257,12 @@ public class Bot : PlayerBase
             }
             if (c==hand.Count-1 && correctPlaces.Count==0)
             {
-                if (hand.Count < PlayerBase.maxStonesCount && !GameCore.stonesPile.IsEmpty())
+                if (hand.Count < PlayerBase.maxStonesCount && !pile.IsEmpty())
                     PickStone();
                 else
                 {
-                    GameCore.WriteLog("No correct stones");
-                    GameCore.WriteLog("BOT TURN END");
+                    gameCore.WriteLog("No correct stones");
+                    gameCore.WriteLog("BOT TURN END");
                     return;
                 }
             }
@@ -271,9 +276,9 @@ public class Bot : PlayerBase
         if (chosenPlacement.i1 > chosenPlacement.i2) side = 2;
         if (chosenPlacement.j1 > chosenPlacement.j2) side = 3;
         chosenStone.Rotate(side);
-        GameCore.PlaceStone(chosenStone, chosenPlacement.dualPlacement, chosenPlacement.connectorPart, chosenPlacement.anchor, chosenPlacement.i1, chosenPlacement.j1, chosenPlacement.i2, chosenPlacement.j2);
-        GameCore.WriteLog("Bot placed stone");
-        GameCore.WriteLog("BOT TURN END");
+        gameCore.PlaceStone(chosenStone, chosenPlacement.dualPlacement, chosenPlacement.connectorPart, chosenPlacement.anchor, chosenPlacement.i1, chosenPlacement.j1, chosenPlacement.i2, chosenPlacement.j2);
+        gameCore.WriteLog("Bot placed stone");
+        gameCore.WriteLog("BOT TURN END");
     }
 
 }

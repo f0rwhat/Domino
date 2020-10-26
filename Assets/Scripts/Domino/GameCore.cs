@@ -6,37 +6,40 @@ using System.IO;
 
 public class GameCore : MonoBehaviour
 {
-    public enum TurnType
+    enum TurnType
     {
         TT_Player = 0,
         TT_Bot = 1
     }
-    static public int fieldHeight = 12
-                    , fieldWidth = 16;
     const float verticalFieldX = -7.5f,
-               verticalFieldY = 5f,
-               horizontalFieldX = -7f,
-               horizontalFieldY = 5.5f,
-               stoneSize = 1f;
-    static public Pile stonesPile;
-    static public Stone draggedStone;
-    static public bool stoneBeingDragged = false;
-    static public bool isGameOnPause;
-    static public SpriteRenderer[,] fieldBlocks;
-    static public int[,,] field;
-    static public GameObject Camera2D, Camera3D;
-    static public bool is3DModeEnabled = true, cameraRotationEnabled = true;
+                verticalFieldY = 5f,
+                horizontalFieldX = -7f,
+                horizontalFieldY = 5.5f,
+                stoneSize = 1f;
+    bool isEndGameCondition = false;
+    Pile stonesPile;
     Player player;
     Bot bot;
-    static TurnType currentTurn = TurnType.TT_Player;
-    static bool isEndGameCondition = false, isGameStarted = false;
-    static GameObject exitPanel, rulesPanel, winText, looseText;
+    GameObject exitPanel, winText, looseText;
     StoneEffect stoneEffect;
+    TurnType currentTurn = TurnType.TT_Player;
+
+    public int fieldHeight = 12, 
+               fieldWidth = 16;
+    public Stone draggedStone;
+    public bool stoneBeingDragged = false;
+    public bool isGameOnPause;
+    public SpriteRenderer[,] fieldBlocks;
+    public int[,,] field;
+    public GameObject Camera2D, Camera3D;
+    public bool is3DModeEnabled = true, cameraRotationEnabled = true;
+    
+    
+    
     
     void Start()
     {
         exitPanel = GameObject.Find("ExitPanel");
-        //rulesPanel = GameObject.Find("RulesPanel");
         winText = GameObject.Find("WinText");
         looseText = GameObject.Find("LooseText");
         Camera2D = GameObject.Find("2D Camera");
@@ -44,24 +47,10 @@ public class GameCore : MonoBehaviour
         Camera2D.SetActive(false);
         Camera3D.SetActive(true);
         exitPanel.SetActive(false);
-        //rulesPanel.SetActive(true);
         winText.SetActive(false);
         looseText.SetActive(false);
         isGameOnPause = false;
-        isGameStarted = false;
-    }
-    void LoadGame() //инициализация компонентов
-    {
-        /*exitPanel = GameObject.Find("ExitPanel");
-        rulesPanel = GameObject.Find("RulesPanel");
-        winText = GameObject.Find("WinText");
-        looseText = GameObject.Find("LooseText");
-        exitPanel.SetActive(false);
-        rulesPanel.SetActive(true);
-        winText.SetActive(false);
-        looseText.SetActive(false);*/
 
-        //GameObject canvas = GameObject.Find("Canvas");
         StoneEffect stonePrefab = Resources.Load<StoneEffect>("Domino/Prefab/StoneEffect");
         stoneEffect = StoneEffect.Instantiate(stonePrefab, null);
         stoneEffect.Deploy();
@@ -83,15 +72,15 @@ public class GameCore : MonoBehaviour
                 fieldBlocks[i, j].sprite = stoneSprites[0];
                 fieldBlocks[i, j].transform.localScale = new Vector3(1, 1, 0);
                 fieldBlocks[i, j].gameObject.SetActive(true);
-                fieldBlocks[i, j].color = new Color(1,0,0,0);
+                fieldBlocks[i, j].color = new Color(1, 0, 0, 0);
                 field[i, j, 0] = -1;
                 field[i, j, 1] = 0;
             }
         }
 
-        stonesPile = new Pile();
-        player = new Player();
-        bot = new Bot();
+        stonesPile = GameObject.Find("Pile").GetComponent<Pile>();
+        player = GameObject.Find("Player").GetComponent<Player>();
+        bot = GameObject.Find("Bot").GetComponent<Bot>();
 
         stonesPile.GeneratePile();
 
@@ -108,10 +97,9 @@ public class GameCore : MonoBehaviour
             bot.PickStone();
         }
         exitPanel.transform.SetAsLastSibling();
-        isGameStarted = true;
         isGameOnPause = false;
     }
-    static public void WriteLog(string log)
+    public void WriteLog(string log) //функция для записи в лог файл.
     {
         if (Directory.Exists("Logs/") == false)
         {
@@ -122,7 +110,7 @@ public class GameCore : MonoBehaviour
         sw.WriteLine(log);
         sw.Close();
     }
-    static (int direction, Vector2 anchor) OneCorrectAround(int i, int j, int value) //проверка на наличие кости для состыковки вокруг новой кости
+    (int direction, Vector2 anchor) OneCorrectAround(int i, int j, int value) //проверка на наличие кости для состыковки вокруг новой кости
     {
         //Debug.Log(i + "---" + j);
         if (i < 0 || i >= fieldHeight || j<0 || j>=fieldWidth)
@@ -157,7 +145,7 @@ public class GameCore : MonoBehaviour
         }
         return (0, new Vector2());
     }
-    static bool AnyOneAround(int i, int j) //проверка на наличие костей вокруг новой кости
+    bool AnyOneAround(int i, int j) //проверка на наличие костей вокруг новой кости
     {
         if (i < 0 || i >= fieldHeight || j < 0 || j >= fieldWidth)
             return true;
@@ -167,7 +155,7 @@ public class GameCore : MonoBehaviour
         if (j + 1 < fieldWidth && field[i, j + 1, 0] > -1) return true;
         return false;
     }
-    static bool anyOneAroundforDual(int i, int j, int side, int dir) //проверка на наличие подходящей кости для "поперечной" состыковки
+    bool anyOneAroundforDual(int i, int j, int side, int dir) //проверка на наличие подходящей кости для "поперечной" состыковки
     {
         switch (side)
         {
@@ -196,7 +184,7 @@ public class GameCore : MonoBehaviour
         }
         return true;
     }
-    static public (bool canBePlaced, bool dualPlacement, Vector2 anchor, int connectorPart) IfCanBePlaced(int i1, int j1, int firstValue, int i2, int j2, int secondValue) //проверка на возможность расположения кости
+    public (bool canBePlaced, bool dualPlacement, Vector2 anchor, int connectorPart) IfCanBePlaced(int i1, int j1, int firstValue, int i2, int j2, int secondValue) //проверка на возможность расположения кости
     {
         if (i1 < 0  || i1 >=fieldHeight || i2 < 0 || i2 >= fieldHeight 
             || j1 < 0 || j1 >= fieldWidth || j2 < 0 || j2 >= fieldWidth) 
@@ -368,7 +356,7 @@ public class GameCore : MonoBehaviour
         }
         return (false, false, new Vector2(), 0);
     }
-    static bool AnchorCheck(int i, int j) //проверка края цепи на возможность расположения кости
+    bool AnchorCheck(int i, int j) //проверка края цепи на возможность расположения кости
     {
         if (i == -1 || j == -1)
             return false;
@@ -444,7 +432,7 @@ public class GameCore : MonoBehaviour
         {
             for (int j = 0; j < fieldWidth && secondAnchor == new Vector2(-1, -1); j++)
             {
-                if (GameCore.field[i, j, 0] > -1 && GameCore.field[i, j, 1] < 2)
+                if (field[i, j, 0] > -1 && field[i, j, 1] < 2)
                 {
                     if (firstAnchor == new Vector2(-1, -1)) firstAnchor = new Vector2(j, i);
                     else secondAnchor = new Vector2(j, i);
@@ -477,7 +465,7 @@ public class GameCore : MonoBehaviour
         WriteLog("AnyMovesAvailable check end:"+ (playerCanMove || botCanMove));
         return (playerCanMove, botCanMove);
     }
-    static void EndGame(int winner) //конец игры
+    void EndGame(int winner) //конец игры
     {
         switch (winner)
         {
@@ -553,11 +541,11 @@ public class GameCore : MonoBehaviour
                 break;
         }
     }
-    static public Camera CurrentCamera()
+    public Camera CurrentCamera()
     {
         return (is3DModeEnabled ? Camera3D.GetComponent<Camera>() : Camera2D.GetComponent<Camera>());
     }
-    static Vector3 CalculateScreenPosition(bool dualPlacement, int rotationState, int connectorPart, int i1, int j1, int i2, int j2) //перевод из координат сетки в экранные координаты
+    Vector3 CalculateScreenPosition(bool dualPlacement, int rotationState, int connectorPart, int i1, int j1, int i2, int j2) //перевод из координат сетки в экранные координаты
     {
         if (dualPlacement)
         {
@@ -632,7 +620,7 @@ public class GameCore : MonoBehaviour
         }
         return new Vector3();
     }
-    static public void PlaceStone(Stone stone, bool dualPlacement, int connectorPart, Vector2 anchor, int i1, int j1, int i2, int j2) //закрепление камня на поле
+    public void PlaceStone(Stone stone, bool dualPlacement, int connectorPart, Vector2 anchor, int i1, int j1, int i2, int j2) //закрепление камня на поле
     {
         Vector3 placementPosition = CalculateScreenPosition(dualPlacement, stone.GetRotationState(), connectorPart, i1, j1, i2, j2);
         stone.SetNewAnchor(placementPosition);
@@ -704,13 +692,9 @@ public class GameCore : MonoBehaviour
     }
     void Update()
     {
-        if (!isGameStarted)
-        {
-            LoadGame();
-        }
         if (isEndGameCondition && Input.anyKeyDown)
         {
-            Application.LoadLevel("Chapter3b");
+            //Application.LoadLevel("Chapter3b");
         }
         if (Input.GetKeyDown(KeyCode.F5))
         {

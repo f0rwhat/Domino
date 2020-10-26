@@ -6,12 +6,12 @@ using UnityEngine.EventSystems;
 public class Stone : MonoBehaviour
 {
     public float speed;
-    bool isBeingDragged, isMovable;
+    bool isBeingDragged, isMovable, initialised = false;
     byte firstValue, secondValue, rotationState;
     Vector3 anchorPoint = new Vector3(700,0,0);
     SpriteRenderer firstSprite, secondSprite;
     static Sprite[] spriteSheet;
-    bool initialised = false;
+    static GameCore gameCore;
 
     private void Start()
     {
@@ -19,7 +19,10 @@ public class Stone : MonoBehaviour
         {
             spriteSheet = Resources.LoadAll<Sprite>("Domino/Sprites/txt_bones");
         }
-        
+        if (gameCore == null)
+        {
+            gameCore = GameObject.Find("GameCore").GetComponent<GameCore>();
+        }
     }
 
     public void Init(byte _firstValue, byte _secondValue)//инициализация кости
@@ -92,7 +95,7 @@ public class Stone : MonoBehaviour
     {
         {   if (isBeingDragged)
             {
-                var camera = GameCore.CurrentCamera();
+                var camera = gameCore.CurrentCamera();
                 //transform.position = mp;
 
                 var distance_to_screen = camera.WorldToScreenPoint(gameObject.transform.position).z;
@@ -127,11 +130,11 @@ public class Stone : MonoBehaviour
 
     void OnMouseOver()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0) && isMovable && !GameCore.stoneBeingDragged)
+        if (Input.GetKeyDown(KeyCode.Mouse0) && isMovable && !gameCore.stoneBeingDragged)
         {
             isBeingDragged = true;
-            GameCore.stoneBeingDragged = true;
-            GameCore.draggedStone = this;
+            gameCore.stoneBeingDragged = true;
+            gameCore.draggedStone = this;
             firstSprite.sortingOrder = 10;
             secondSprite.sortingOrder = 10;
         }
@@ -153,7 +156,7 @@ public class Stone : MonoBehaviour
         if (!initialised)
             return;
         Move();
-        if (GameCore.isGameOnPause)
+        if (gameCore.isGameOnPause)
         {
             isBeingDragged = false;
             return;
