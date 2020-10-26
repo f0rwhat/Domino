@@ -7,21 +7,19 @@ public class Pile: MonoBehaviour
     private Stone stonePrefab;
     private List<Stone> pile = new List<Stone>();
 
-    public Pile()
-    {
-    }
     void Start()
     {
-        stonePrefab = Resources.Load<Stone>("Domino/Prefab/Stone");
+        stonePrefab = GameObject.Find("Stone").GetComponent<Stone>();
     }
     public void GeneratePile()//инициализация кучи
     {
+        //stonePrefab = GameObject.Find("Stone").GetComponent<Stone>();
         //GameObject canvas = GameObject.Find("Canvas");
         for (byte i = 0; i <= 6; i++)
         {
             for (byte j = i; j <= 6; j++)
             {
-                Stone temp = Stone.Instantiate<Stone>(stonePrefab, new Vector3(0, 0, 0), stonePrefab.transform.rotation);
+                Stone temp = Stone.Instantiate<Stone>(stonePrefab,new Vector3 (0,0,0),stonePrefab.transform.rotation);
                 temp.Init(i, j);
                 pile.Insert(Random.Range(0, pile.Count), temp);
             }
