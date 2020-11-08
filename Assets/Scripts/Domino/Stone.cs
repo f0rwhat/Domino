@@ -12,17 +12,19 @@ public class Stone : MonoBehaviour
     SpriteRenderer firstSprite, secondSprite;
     static Sprite[] spriteSheet;
     static GameCore gameCore;
-
+    static Camera mainCamera;
     private void Start()
     {
         if (spriteSheet == null)
         {
             spriteSheet = Resources.LoadAll<Sprite>("Domino/Sprites/txt_bones");
         }
-        if (gameCore == null)
-        {
-            gameCore = GameObject.Find("GameCore").GetComponent<GameCore>();
-        }
+        gameCore = GameObject.Find("GameCore").GetComponent<GameCore>();
+        mainCamera = GameObject.Find("3D Camera").GetComponent<Camera>();
+        //if (gameCore == null)
+        //{
+        //    gameCore = GameObject.Find("GameCore").GetComponent<GameCore>();
+        //}
     }
 
     public void Init(byte _firstValue, byte _secondValue)//инициализация кости
@@ -33,6 +35,10 @@ public class Stone : MonoBehaviour
         isBeingDragged = false;
         firstSprite = transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
         secondSprite = transform.GetChild(1).gameObject.GetComponent<SpriteRenderer>();
+        //if (spriteSheet == null)
+        //{
+        //    Debug.Log("sprite sheet is null");
+        //}
         firstSprite.sprite = spriteSheet[firstValue];
         secondSprite.sprite = spriteSheet[secondValue];
         gameObject.SetActive(false);
@@ -95,11 +101,8 @@ public class Stone : MonoBehaviour
     {
         {   if (isBeingDragged)
             {
-                var camera = gameCore.CurrentCamera();
-                //transform.position = mp;
-
-                var distance_to_screen = camera.WorldToScreenPoint(gameObject.transform.position).z;
-                var pos_move = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
+                var distance_to_screen = mainCamera.WorldToScreenPoint(gameObject.transform.position).z;
+                var pos_move = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance_to_screen));
                 transform.position = new Vector3(pos_move.x, pos_move.y, 0.5f);
             }
             else
@@ -110,6 +113,7 @@ public class Stone : MonoBehaviour
                 }
                 if (Vector3.Distance(anchorPoint, transform.localPosition) > 0.01)
                 {
+                    //transform.position = Vector3.MoveTowards(transform.localPosition, anchorPoint, speed * Time.deltaTime);
                     transform.localPosition = Vector3.Lerp(transform.localPosition, anchorPoint, speed * Time.deltaTime);
                 }
                 else
@@ -153,7 +157,7 @@ public class Stone : MonoBehaviour
 
     void Update()
     {
-        if (!initialised)
+        if (!initialised || gameCore.isGameOnPause)
             return;
         Move();
         if (gameCore.isGameOnPause)

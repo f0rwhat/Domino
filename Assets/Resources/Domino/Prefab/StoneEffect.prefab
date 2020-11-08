@@ -105,7 +105,7 @@ GameObject:
   - component: {fileID: 6239077623185519003}
   - component: {fileID: 1290965885050248340}
   - component: {fileID: 3893563666566669509}
-  - component: {fileID: 3131334091509372956}
+  - component: {fileID: 1135046009891670723}
   m_Layer: 0
   m_Name: StoneEffect
   m_TagString: Untagged
@@ -176,7 +176,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.0001569, y: 2.0075707}
   m_EdgeRadius: 0
---- !u!114 &3131334091509372956
+--- !u!114 &1135046009891670723
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -188,8 +188,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 196556493fca9224b9da2c30a94d13c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firstSprite: {fileID: 0}
-  secondSprite: {fileID: 0}
 --- !u!1 &8598357543374765378
 GameObject:
   m_ObjectHideFlags: 0

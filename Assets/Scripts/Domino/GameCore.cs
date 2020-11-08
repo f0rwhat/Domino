@@ -1,8 +1,6 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using System.IO;
-
+using UnityEngine;
 
 public class GameCore : MonoBehaviour
 {
@@ -16,44 +14,40 @@ public class GameCore : MonoBehaviour
                 horizontalFieldX = -7f,
                 horizontalFieldY = 5.5f,
                 stoneSize = 1f;
-    bool isEndGameCondition = false;
+    bool isEndGameCondition = false, isGameGoing = false;
     Pile stonesPile;
     Player player;
     Bot bot;
-    GameObject exitPanel, winText, looseText;
-    StoneEffect stoneEffect;
+    Pile pile;
+    GameObject winText, looseText;
+    MenuButtons menu;
     TurnType currentTurn = TurnType.TT_Player;
 
-    public int fieldHeight = 12, 
+    public int fieldHeight = 12,
                fieldWidth = 16;
+    public StoneEffect stoneEffect;
     public Stone draggedStone;
     public bool stoneBeingDragged = false;
     public bool isGameOnPause;
     public SpriteRenderer[,] fieldBlocks;
     public int[,,] field;
-    public GameObject Camera2D, Camera3D;
+    public GameObject mainCamera;
     public bool is3DModeEnabled = true, cameraRotationEnabled = true;
-    
-    
-    
-    
+
     void Start()
     {
-        exitPanel = GameObject.Find("ExitPanel");
         winText = GameObject.Find("WinText");
         looseText = GameObject.Find("LooseText");
-        Camera2D = GameObject.Find("2D Camera");
-        Camera3D = GameObject.Find("3D Camera");
-        Camera2D.SetActive(false);
-        Camera3D.SetActive(true);
-        exitPanel.SetActive(false);
+        mainCamera = GameObject.Find("3D Camera");
+        pile = GameObject.Find("Pile").GetComponent<Pile>();
+        menu = GameObject.Find("MenuPanel").GetComponent<MenuButtons>();
+        mainCamera.SetActive(true);
         winText.SetActive(false);
         looseText.SetActive(false);
         isGameOnPause = false;
 
         StoneEffect stonePrefab = Resources.Load<StoneEffect>("Domino/Prefab/StoneEffect");
-        stoneEffect = StoneEffect.Instantiate(stonePrefab, null);
-        stoneEffect.Deploy();
+        stoneEffect = StoneEffect.Instantiate(stonePrefab);
         stoneEffect.transform.localScale = new Vector3(1, 1, 0);
         stoneEffect.SetRotationState(3);
 
@@ -82,24 +76,103 @@ public class GameCore : MonoBehaviour
         player = GameObject.Find("Player").GetComponent<Player>();
         bot = GameObject.Find("Bot").GetComponent<Bot>();
 
+        
+        isGameOnPause = false;
+    }
+    public void StartGame()
+    {
         stonesPile.GeneratePile();
-
-        Stone firstStone = stonesPile.GetDual();
-        field[4, 7, 0] = -2;
-        field[5, 7, 0] = firstStone.Values().firstValue;
-        field[6, 7, 0] = -2;
-        field[5, 7, 1] = 0;
-        firstStone.SetNewAnchor(new Vector3(-0.5f, 0.5f, 0));
-
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 7; i++)
         {
             player.PickStone();
             bot.PickStone();
         }
-        exitPanel.transform.SetAsLastSibling();
-        isGameOnPause = false;
+        StartCoroutine(MakeFirstMove());
     }
-    public void WriteLog(string log) //функция для записи в лог файл.
+    IEnumerator MakeFirstMove()
+    {
+        yield return new WaitForSeconds(3f);
+        Stone playerBiggest = player.ShowBiggestStone(),
+              botBiggest = bot.ShowBiggestStone(),
+              chosenStone = playerBiggest;
+
+        bool playerIsBigger = (playerBiggest.Values().firstValue + playerBiggest.Values().secondValue > botBiggest.Values().firstValue + botBiggest.Values().secondValue),
+             playerIsDual = (playerBiggest.Values().firstValue == playerBiggest.Values().secondValue),
+             botIsDual = (botBiggest.Values().firstValue == botBiggest.Values().secondValue),
+             chosenIsPlayer = false;
+
+        if (botIsDual && playerIsDual)
+        {
+            if (playerIsBigger)
+            {
+                chosenStone = playerBiggest;
+                player.DropStone(chosenStone);
+                chosenIsPlayer = true;
+            }
+            else
+            {
+                chosenStone = botBiggest;
+                bot.DropStone(chosenStone);
+            }
+        }
+        else if (!botIsDual && playerIsDual)
+        {
+            chosenStone = playerBiggest;
+            player.DropStone(chosenStone);
+            chosenIsPlayer = true;
+        }
+        else if (botIsDual && !playerIsDual)
+        {
+            chosenStone = botBiggest;
+            bot.DropStone(chosenStone);
+        }
+        else if (!botIsDual && !playerIsDual)
+        {
+            if (playerIsBigger)
+            {
+                chosenStone = playerBiggest;
+                player.DropStone(chosenStone);
+                chosenIsPlayer = true;
+            }
+            else
+            {
+                chosenStone = botBiggest;
+                bot.DropStone(chosenStone);
+            }
+        }
+
+        if (chosenStone.Values().firstValue == chosenStone.Values().secondValue)
+        {
+            WriteLog("FirstMove:Chosen is Dual");
+            field[4, 7, 0] = -2;
+            field[5, 7, 0] = chosenStone.Values().firstValue;
+            field[6, 7, 0] = -2;
+            field[5, 7, 1] = 0;
+            chosenStone.SetNewAnchor(new Vector3(-0.5f, 0.5f, 0));
+        }
+        else
+        {
+            WriteLog("FirstMove:Chosen isnt Dual");
+            field[5, 7, 0] = chosenStone.Values().firstValue;
+            field[5, 7, 1] = 1;
+            field[6, 7, 0] = chosenStone.Values().secondValue;
+            field[6, 7, 1] = 1;
+            chosenStone.SetNewAnchor(new Vector3(-0.5f, 0f, 0));
+        }
+        isGameGoing = true;
+        if (chosenIsPlayer)
+        {
+            WriteLog("FirstMove: first move was from player, switching to bot");
+            TurnSwitch();
+        }
+        else 
+        {
+            WriteLog("FirstMove: first move was from bot");
+        }
+        yield break;
+    }
+
+    public static void WriteLog(string log) //функция для записи в лог файл.
     {
         if (Directory.Exists("Logs/") == false)
         {
@@ -113,35 +186,35 @@ public class GameCore : MonoBehaviour
     (int direction, Vector2 anchor) OneCorrectAround(int i, int j, int value) //проверка на наличие кости для состыковки вокруг новой кости
     {
         //Debug.Log(i + "---" + j);
-        if (i < 0 || i >= fieldHeight || j<0 || j>=fieldWidth)
+        if (i < 0 || i >= fieldHeight || j < 0 || j >= fieldWidth)
             return (0, new Vector2());
         if (i - 1 >= 0 && field[i - 1, j, 0] == value && field[i - 1, j, 1] < 2) //кость сверху
         {
             if (j - 1 >= 0 && field[i, j - 1, 0] > -1) return (0, new Vector2());
             if (j + 1 < fieldWidth && field[i, j + 1, 0] > -1) return (0, new Vector2());
             if (i + 1 < fieldHeight && field[i + 1, j, 0] > -1) return (0, new Vector2());
-            return (1, new Vector2(j,i-1));
+            return (1, new Vector2(j, i - 1));
         }
         if (j - 1 >= 0 && field[i, j - 1, 0] == value && field[i, j - 1, 1] < 2) //кость слева
         {
             if (i - 1 >= 0 && field[i - 1, j, 0] > -1) return (0, new Vector2());
             if (i + 1 < fieldHeight && field[i + 1, j, 0] > -1) return (0, new Vector2());
             if (j + 1 < fieldWidth && field[i, j + 1, 0] > -1) return (0, new Vector2());
-            return (2, new Vector2(j-1,i));
+            return (2, new Vector2(j - 1, i));
         }
         if (i + 1 < fieldHeight && field[i + 1, j, 0] == value && field[i + 1, j, 1] < 2) //кость внизу
         {
             if (i - 1 >= 0 && field[i - 1, j, 0] > -1) return (0, new Vector2());
             if (j - 1 >= 0 && field[i, j - 1, 0] > -1) return (0, new Vector2());
             if (j + 1 < fieldWidth && field[i, j + 1, 0] > -1) return (0, new Vector2());
-            return (3, new Vector2(j,i+1));
+            return (3, new Vector2(j, i + 1));
         }
         if (j + 1 < fieldWidth && field[i, j + 1, 0] == value && field[i, j + 1, 1] < 2) //кость справа
         {
             if (i - 1 >= 0 && field[i - 1, j, 0] > -1) return (0, new Vector2());
             if (j - 1 >= 0 && field[i, j - 1, 0] > -1) return (0, new Vector2());
             if (i + 1 < fieldHeight && field[i + 1, j, 0] > -1) return (0, new Vector2());
-            return (4, new Vector2(j+1,i));
+            return (4, new Vector2(j + 1, i));
         }
         return (0, new Vector2());
     }
@@ -159,7 +232,8 @@ public class GameCore : MonoBehaviour
     {
         switch (side)
         {
-            case 1: case 3:
+            case 1:
+            case 3:
                 switch (dir)
                 {
                     case 2:
@@ -170,7 +244,8 @@ public class GameCore : MonoBehaviour
                         break;
                 }
                 break;
-            case 2: case 4:
+            case 2:
+            case 4:
                 switch (dir)
                 {
                     case 1:
@@ -186,8 +261,8 @@ public class GameCore : MonoBehaviour
     }
     public (bool canBePlaced, bool dualPlacement, Vector2 anchor, int connectorPart) IfCanBePlaced(int i1, int j1, int firstValue, int i2, int j2, int secondValue) //проверка на возможность расположения кости
     {
-        if (i1 < 0  || i1 >=fieldHeight || i2 < 0 || i2 >= fieldHeight 
-            || j1 < 0 || j1 >= fieldWidth || j2 < 0 || j2 >= fieldWidth) 
+        if (i1 < 0 || i1 >= fieldHeight || i2 < 0 || i2 >= fieldHeight
+            || j1 < 0 || j1 >= fieldWidth || j2 < 0 || j2 >= fieldWidth)
             return (false, false, new Vector2(), 0);
         if (field[i1, j1, 0] != -1 || field[i2, j2, 0] != -1)
             return (false, false, new Vector2(), 0);
@@ -203,13 +278,15 @@ public class GameCore : MonoBehaviour
         {
             switch (side)
             {
-                case 1: case 3:
+                case 1:
+                case 3:
                     if ((firstState.direction == 2 || firstState.direction == 4) && !anyOneAroundforDual(i1, j1, side, firstState.direction))
                         return (true, true, firstState.anchor, 1);
                     if ((secondState.direction == 2 || secondState.direction == 4) && !anyOneAroundforDual(i2, j2, side, secondState.direction))
                         return (true, true, secondState.anchor, 2);
                     break;
-                case 2: case 4:
+                case 2:
+                case 4:
                     if ((firstState.direction == 1 || firstState.direction == 3) && !anyOneAroundforDual(i1, j1, side, firstState.direction))
                         return (true, true, firstState.anchor, 1);
                     if ((secondState.direction == 1 || secondState.direction == 3) && !anyOneAroundforDual(i2, j2, side, secondState.direction))
@@ -226,10 +303,11 @@ public class GameCore : MonoBehaviour
                         if (!AnyOneAround(i2, j2))
                             return (true, false, firstState.anchor, 1);
                         break;
-                    case 2: case 4:
+                    case 2:
+                    case 4:
                         if ((int)firstState.anchor.y - 1 >= 0)
                         {
-                            if (field[(int)firstState.anchor.y - 1, (int)firstState.anchor.x, 0] <= -1 && !AnyOneAround(i2, j2) )
+                            if (field[(int)firstState.anchor.y - 1, (int)firstState.anchor.x, 0] <= -1 && !AnyOneAround(i2, j2))
                                 return (true, false, firstState.anchor, 1);
                         }
                         else if (!AnyOneAround(i2, j2))
@@ -242,7 +320,8 @@ public class GameCore : MonoBehaviour
                         if (!AnyOneAround(i1, j1))
                             return (true, false, secondState.anchor, 2);
                         break;
-                    case 2: case 4:
+                    case 2:
+                    case 4:
                         if ((int)secondState.anchor.y + 1 < fieldHeight)
                         {
                             if (field[(int)secondState.anchor.y + 1, (int)secondState.anchor.x, 0] <= -1 && !AnyOneAround(i1, j1))
@@ -260,7 +339,8 @@ public class GameCore : MonoBehaviour
                         if (!AnyOneAround(i2, j2))
                             return (true, false, firstState.anchor, 1);
                         break;
-                    case 1: case 3:
+                    case 1:
+                    case 3:
                         if ((int)firstState.anchor.x - 1 >= 0)
                         {
                             if (field[(int)firstState.anchor.y, (int)firstState.anchor.x - 1, 0] <= -1 && !AnyOneAround(i2, j2))
@@ -274,7 +354,8 @@ public class GameCore : MonoBehaviour
                         if (!AnyOneAround(i1, j1))
                             return (true, false, secondState.anchor, 2);
                         break;
-                    case 1: case 3:
+                    case 1:
+                    case 3:
                         if ((int)secondState.anchor.x + 1 < fieldWidth)
                         {
                             if (field[(int)secondState.anchor.y, (int)secondState.anchor.x + 1, 0] <= -1 && !AnyOneAround(i1, j1))
@@ -292,7 +373,8 @@ public class GameCore : MonoBehaviour
                         if (!AnyOneAround(i2, j2))
                             return (true, false, firstState.anchor, 1);
                         break;
-                    case 2: case 4:
+                    case 2:
+                    case 4:
                         if ((int)firstState.anchor.y + 1 < fieldHeight)
                         {
                             if (field[(int)firstState.anchor.y + 1, (int)firstState.anchor.x, 0] <= -1 && !AnyOneAround(i2, j2))
@@ -308,7 +390,8 @@ public class GameCore : MonoBehaviour
                         if (!AnyOneAround(i1, j1))
                             return (true, false, secondState.anchor, 2);
                         break;
-                    case 2: case 4:
+                    case 2:
+                    case 4:
                         if ((int)secondState.anchor.y - 1 >= 0)
                         {
                             if (field[(int)secondState.anchor.y - 1, (int)secondState.anchor.x, 0] <= -1 && !AnyOneAround(i1, j1))
@@ -326,7 +409,8 @@ public class GameCore : MonoBehaviour
                         if (!AnyOneAround(i2, j2))
                             return (true, false, firstState.anchor, 1);
                         break;
-                    case 1: case 3:
+                    case 1:
+                    case 3:
                         if ((int)firstState.anchor.x + 1 < fieldWidth)
                         {
                             if (field[(int)firstState.anchor.y, (int)firstState.anchor.x + 1, 0] <= -1 && !AnyOneAround(i2, j2))
@@ -342,7 +426,8 @@ public class GameCore : MonoBehaviour
                         if (!AnyOneAround(i1, j1))
                             return (true, false, secondState.anchor, 2);
                         break;
-                    case 1: case 3:
+                    case 1:
+                    case 3:
                         if ((int)secondState.anchor.x - 1 >= 0)
                         {
                             if (field[(int)secondState.anchor.y, (int)secondState.anchor.x - 1, 0] <= -1 && !AnyOneAround(i1, j1))
@@ -447,11 +532,11 @@ public class GameCore : MonoBehaviour
             return (false, false);
         }
 
-        bool playerCanMove = ((firstAnchor != new Vector2(-1, -1) && player.HasStoneWithValue(field[(int)firstAnchor.y, (int)firstAnchor.x,0]) && firstAnchorCheck) 
-                             || (secondAnchor != new Vector2(-1, -1) && player.HasStoneWithValue(field[(int)secondAnchor.y, (int)secondAnchor.x, 0]) && secondAnchorCheck) 
+        bool playerCanMove = ((firstAnchor != new Vector2(-1, -1) && player.HasStoneWithValue(field[(int)firstAnchor.y, (int)firstAnchor.x, 0]) && firstAnchorCheck)
+                             || (secondAnchor != new Vector2(-1, -1) && player.HasStoneWithValue(field[(int)secondAnchor.y, (int)secondAnchor.x, 0]) && secondAnchorCheck)
                              || (!stonesPile.IsEmpty() && player.StonesInHandCount() < PlayerBase.maxStonesCount)),
-             botCanMove = ((firstAnchor != new Vector2(-1, -1) && bot.HasStoneWithValue(field[(int)firstAnchor.y, (int)firstAnchor.x, 0]) && firstAnchorCheck) 
-                             || (secondAnchor != new Vector2(-1, -1)  && bot.HasStoneWithValue(field[(int)secondAnchor.y, (int)secondAnchor.x, 0]) && secondAnchorCheck) 
+             botCanMove = ((firstAnchor != new Vector2(-1, -1) && bot.HasStoneWithValue(field[(int)firstAnchor.y, (int)firstAnchor.x, 0]) && firstAnchorCheck)
+                             || (secondAnchor != new Vector2(-1, -1) && bot.HasStoneWithValue(field[(int)secondAnchor.y, (int)secondAnchor.x, 0]) && secondAnchorCheck)
                              || (!stonesPile.IsEmpty() && bot.StonesInHandCount() < PlayerBase.maxStonesCount));
 
         if (!playerCanMove && !botCanMove && stonesPile.IsEmpty())
@@ -461,8 +546,8 @@ public class GameCore : MonoBehaviour
         }
         WriteLog("Bot has stone to move:" + botCanMove);
         WriteLog("Player has stone to move:" + playerCanMove);
-       
-        WriteLog("AnyMovesAvailable check end:"+ (playerCanMove || botCanMove));
+
+        WriteLog("AnyMovesAvailable check end:" + (playerCanMove || botCanMove));
         return (playerCanMove, botCanMove);
     }
     void EndGame(int winner) //конец игры
@@ -485,6 +570,24 @@ public class GameCore : MonoBehaviour
         }
         isEndGameCondition = true;
     }
+    public void FinishGame()
+    {
+        StopCoroutine(MakeFirstMove());
+        player.ClearHand();
+        bot.ClearHand();
+        pile.ClearPile();
+        stoneEffect.SetEffect(StoneEffect.EffectType.ET_Transparent);
+        Stone[] stones = Resources.FindObjectsOfTypeAll<Stone>(); //GameObject.FindGameObjectsWithTag("Stone");
+        foreach (Stone stone in stones)
+        {
+            if (stone.gameObject.name!="Stone")
+                Destroy(stone.gameObject);
+        }
+        winText.SetActive(false);
+        looseText.SetActive(false);
+        isGameGoing = false;
+        menu.GoMenu();
+    }
     void CheckForWin()
     {
         if (player.StonesInHandCount() == bot.StonesInHandCount())
@@ -503,13 +606,13 @@ public class GameCore : MonoBehaviour
     public void TurnSwitch() //смена хода
     {
         var movesCheckResult = AnyMovesAvailable();
-        if ((!movesCheckResult.playerCanMove && !movesCheckResult.botCanMove) 
+        if ((!movesCheckResult.playerCanMove && !movesCheckResult.botCanMove)
             || (player.StonesInHandCount() == 0 || bot.StonesInHandCount() == 0))
         {
             CheckForWin();
             return;
         }
-        switch(currentTurn)
+        switch (currentTurn)
         {
             case TurnType.TT_Bot:
                 if (movesCheckResult.playerCanMove)
@@ -541,10 +644,6 @@ public class GameCore : MonoBehaviour
                 break;
         }
     }
-    public Camera CurrentCamera()
-    {
-        return (is3DModeEnabled ? Camera3D.GetComponent<Camera>() : Camera2D.GetComponent<Camera>());
-    }
     Vector3 CalculateScreenPosition(bool dualPlacement, int rotationState, int connectorPart, int i1, int j1, int i2, int j2) //перевод из координат сетки в экранные координаты
     {
         if (dualPlacement)
@@ -555,10 +654,10 @@ public class GameCore : MonoBehaviour
                     switch (connectorPart)
                     {
                         case 1:
-                            return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize + stoneSize/2, 0.77f);
+                            return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize + stoneSize / 2, 0.77f);
                             break;
                         case 2:
-                            return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize - stoneSize/2, 0.77f);
+                            return new Vector3(verticalFieldX + j1 * stoneSize, verticalFieldY - i1 * stoneSize - stoneSize / 2, 0.77f);
                             break;
                     }
 
@@ -579,10 +678,10 @@ public class GameCore : MonoBehaviour
                     switch (connectorPart)
                     {
                         case 1:
-                            return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize - stoneSize/2, 0.77f);
+                            return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize - stoneSize / 2, 0.77f);
                             break;
                         case 2:
-                            return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize + stoneSize/2, 0.77f);
+                            return new Vector3(verticalFieldX + j2 * stoneSize, verticalFieldY - i2 * stoneSize + stoneSize / 2, 0.77f);
                             break;
                     }
                     break;
@@ -636,14 +735,14 @@ public class GameCore : MonoBehaviour
                     {
                         case 0:
                         case 2:
-                            if (i1 - 1 >= 0) 
+                            if (i1 - 1 >= 0)
                                 field[i1 - 1, j1, 0] = -2;
-                            if (i1 + 1 < fieldHeight) 
+                            if (i1 + 1 < fieldHeight)
                                 field[i1 + 1, j1, 0] = -2;
                             break;
                         case 1:
                         case 3:
-                            if (j1 - 1 >= 0) 
+                            if (j1 - 1 >= 0)
                                 field[i1, j1 - 1, 0] = -2;
                             if (j1 + 1 < fieldWidth)
                                 field[i1, j1 + 1, 0] = -2;
@@ -659,14 +758,14 @@ public class GameCore : MonoBehaviour
                         case 2:
                             if (i2 - 1 >= 0)
                                 field[i2 - 1, j2, 0] = -2;
-                            if (i2 +1 < fieldHeight)
+                            if (i2 + 1 < fieldHeight)
                                 field[i2 + 1, j2, 0] = -2;
                             break;
                         case 1:
                         case 3:
-                            if (j2 - 1 >= 0) 
+                            if (j2 - 1 >= 0)
                                 field[i2, j2 - 1, 0] = -2;
-                            if (j2 +1 <= fieldWidth)
+                            if (j2 + 1 <= fieldWidth)
                                 field[i2, j2 + 1, 0] = -2;
                             break;
                     }
@@ -692,26 +791,18 @@ public class GameCore : MonoBehaviour
     }
     void Update()
     {
+        if (isGameOnPause)
+            return;
         if (isEndGameCondition && Input.anyKeyDown)
         {
-            //Application.LoadLevel("Chapter3b");
+            FinishGame();
+            return;
         }
+        if (!isGameGoing)
+            return;
         if (Input.GetKeyDown(KeyCode.F5))
         {
             EndGame(0);
-        }
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            is3DModeEnabled = !is3DModeEnabled;
-            Camera2D.SetActive(!is3DModeEnabled);
-            Camera3D.SetActive(is3DModeEnabled);
-        }
-        if (!exitPanel.activeSelf)
-            isGameOnPause = false;
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            exitPanel.SetActive(!exitPanel.activeSelf);
-            isGameOnPause = !isGameOnPause;
         }
         if (Input.GetKeyDown(KeyCode.Space) && player.StonesInHandCount() < PlayerBase.maxStonesCount && !stonesPile.IsEmpty() && !isGameOnPause && currentTurn == TurnType.TT_Player)
         {
@@ -726,7 +817,7 @@ public class GameCore : MonoBehaviour
         {
             cameraRotationEnabled = true;
         }
-        if (stoneBeingDragged) 
+        if (stoneBeingDragged)
         {
             int i1 = -1, i2 = -1, j1 = -1, j2 = -1;
             var halfsPositions = draggedStone.HalfsPositions(); //определение позиции кости относительно сетки
@@ -754,7 +845,7 @@ public class GameCore : MonoBehaviour
                 stoneEffect.transform.localPosition = placementPosition;
                 stoneEffect.SetEffect(StoneEffect.EffectType.ET_Green);
             }
-            else 
+            else
             {
                 stoneEffect.SetEffect(StoneEffect.EffectType.ET_Transparent); // в противном случае глушим подсветку
             }

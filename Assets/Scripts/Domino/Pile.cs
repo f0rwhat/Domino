@@ -9,11 +9,11 @@ public class Pile: MonoBehaviour
 
     void Start()
     {
-        stonePrefab = GameObject.Find("Stone").GetComponent<Stone>();
+        //stonePrefab = GameObject.Find("Stone").GetComponent<Stone>();
     }
     public void GeneratePile()//инициализация кучи
     {
-        //stonePrefab = GameObject.Find("Stone").GetComponent<Stone>();
+        stonePrefab = GameObject.Find("Stone").GetComponent<Stone>();
         //GameObject canvas = GameObject.Find("Canvas");
         for (byte i = 0; i <= 6; i++)
         {
@@ -26,26 +26,14 @@ public class Pile: MonoBehaviour
         }
     }
 
-    public Stone GetDual()//поиск кости с одинаковыми половинками, необходимо для начала игры
-    {
-        for (int i = 0; i < pile.Count; i++) 
-        {
-            if (pile[i].Values().firstValue == pile[i].Values().secondValue)
-            {
-                Stone returnStone = pile[i];
-                pile.RemoveAt(i);
-                returnStone.Deploy(false);
-                return returnStone;
-            }
-        }
-        return new Stone();
-    }
-
     public bool IsEmpty()//проверка на наличие костей
     {
         return (pile.Count == 0);
     }
-
+    public void ClearPile()
+    {
+        pile.Clear();
+    }
     public Stone GetStone()//взять одну кость из кучи
     {
         Stone returnStone = pile[0];

@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBase:MonoBehaviour//базовый класс для Player и Bot
+public class PlayerBase : MonoBehaviour//базовый класс для Player и Bot
 {
     public const int maxStonesCount = 16;
     private const int stonesSpacing = 1;
@@ -10,7 +9,7 @@ public class PlayerBase:MonoBehaviour//базовый класс для Player �
     protected Pile pile;
     protected List<Stone> hand;
     protected Vector2 handPos;
-    
+
 
     public PlayerBase(bool _areStonesMovable, Vector2 _handPos)
     {
@@ -24,8 +23,8 @@ public class PlayerBase:MonoBehaviour//базовый класс для Player �
     }
     void ShiftStones()
     {
-        
-        Vector3 pos = new Vector3(-(float)hand.Count / 2 + 0.5f,handPos.y);
+
+        Vector3 pos = new Vector3(-(float)hand.Count / 2 + 0.5f, handPos.y);
         for (int i = 0; i < hand.Count; i++)
         {
             hand[i].SetNewAnchor(pos);
@@ -40,11 +39,31 @@ public class PlayerBase:MonoBehaviour//базовый класс для Player �
         ShiftStones();
     }
 
+    public Stone ShowBiggestStone()
+    {
+        int sum = hand[0].Values().firstValue + hand[0].Values().secondValue,
+            index = 0;
+        for (int i = 1; i < hand.Count; i++)
+        {
+            int newSum = hand[i].Values().firstValue + hand[i].Values().secondValue;
+            if (newSum > sum)
+            {
+                sum = newSum;
+                index = i;
+            }
+        }
+        return hand[index];
+    }
     public void DropStone(Stone stone)//удалить кость из руки
     {
         stone.MakeUnmovable();
         hand.Remove(stone);
         ShiftStones();
+    }
+
+    public void ClearHand()
+    {
+        hand.Clear();
     }
 
     public bool HasStoneWithValue(int value)//проверка на наличие костей с таким значением
@@ -63,4 +82,4 @@ public class PlayerBase:MonoBehaviour//базовый класс для Player �
     {
         return hand.Count;
     }
-} 
+}

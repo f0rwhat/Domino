@@ -70,7 +70,13 @@ public class Bot : PlayerBase
 
     public void MakeTurn()//основная функция бота
     {
-        gameCore.WriteLog("MAKETURN START");
+        StartCoroutine(_PlaceStone());
+    }
+
+    IEnumerator _PlaceStone()
+    {
+        yield return new WaitForSeconds(2f);
+        GameCore.WriteLog("MAKETURN START");
         Vector2 firstAnchor = new Vector2(-1, -1), secondAnchor = new Vector2(-1, -1);
         int[,,] placementChecks;
         List<checkStruct> placebleStones = new List<checkStruct>();
@@ -86,13 +92,13 @@ public class Bot : PlayerBase
                 }
             }
         }
-        gameCore.WriteLog("FirstAnchor::" + firstAnchor.y + "-" + firstAnchor.x);
-        gameCore.WriteLog("SecondAnchor::" + secondAnchor.y + "-" + secondAnchor.x);
+        GameCore.WriteLog("FirstAnchor::" + firstAnchor.y + "-" + firstAnchor.x);
+        GameCore.WriteLog("SecondAnchor::" + secondAnchor.y + "-" + secondAnchor.x);
         if (firstAnchor == new Vector2(-1, -1) && secondAnchor == new Vector2(-1, -1))
         {
-            gameCore.WriteLog("No anchors found");
-            gameCore.WriteLog("BOT TURN END");
-            return;
+            GameCore.WriteLog("No anchors found");
+            GameCore.WriteLog("BOT TURN END");
+            yield break;
         }
 
         for (int c = 0; c < hand.Count; c++)//поиск подходящих костей в руке
@@ -111,7 +117,7 @@ public class Bot : PlayerBase
                 else if (hand[c].Values().secondValue == gameCore.field[(int)secondAnchor.y, (int)secondAnchor.x, 0])
                     placebleStones.Add(new checkStruct(secondAnchor, c, 2));
             }
-            if (c==hand.Count-1)
+            if (c == hand.Count - 1)
             {
                 for (int i = 0; i < placebleStones.Count; i++)//проверка всех возможных расположений для каждой кости
                 {
@@ -255,15 +261,15 @@ public class Bot : PlayerBase
                     }
                 }
             }
-            if (c==hand.Count-1 && correctPlaces.Count==0)
+            if (c == hand.Count - 1 && correctPlaces.Count == 0)
             {
                 if (hand.Count < PlayerBase.maxStonesCount && !pile.IsEmpty())
                     PickStone();
                 else
                 {
-                    gameCore.WriteLog("No correct stones");
-                    gameCore.WriteLog("BOT TURN END");
-                    return;
+                    GameCore.WriteLog("No correct stones");
+                    GameCore.WriteLog("BOT TURN END");
+                    yield break;
                 }
             }
         }
@@ -277,8 +283,8 @@ public class Bot : PlayerBase
         if (chosenPlacement.j1 > chosenPlacement.j2) side = 3;
         chosenStone.Rotate(side);
         gameCore.PlaceStone(chosenStone, chosenPlacement.dualPlacement, chosenPlacement.connectorPart, chosenPlacement.anchor, chosenPlacement.i1, chosenPlacement.j1, chosenPlacement.i2, chosenPlacement.j2);
-        gameCore.WriteLog("Bot placed stone");
-        gameCore.WriteLog("BOT TURN END");
-    }
-
+        GameCore.WriteLog("Bot placed stone");
+        GameCore.WriteLog("BOT TURN END");
+        yield break;
+    }    
 }
