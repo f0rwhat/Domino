@@ -98,6 +98,7 @@ public class Bot : PlayerBase
         {
             GameCore.WriteLog("No anchors found");
             GameCore.WriteLog("BOT TURN END");
+            gameCore.TurnSwitch();
             yield break;
         }
 
@@ -269,6 +270,7 @@ public class Bot : PlayerBase
                 {
                     GameCore.WriteLog("No correct stones");
                     GameCore.WriteLog("BOT TURN END");
+                    gameCore.TurnSwitch();
                     yield break;
                 }
             }
@@ -285,6 +287,7 @@ public class Bot : PlayerBase
         gameCore.PlaceStone(chosenStone, chosenPlacement.dualPlacement, chosenPlacement.connectorPart, chosenPlacement.anchor, chosenPlacement.i1, chosenPlacement.j1, chosenPlacement.i2, chosenPlacement.j2);
         GameCore.WriteLog("Bot placed stone");
         GameCore.WriteLog("BOT TURN END");
+        gameCore.TurnSwitch();
         yield break;
     }    
 }

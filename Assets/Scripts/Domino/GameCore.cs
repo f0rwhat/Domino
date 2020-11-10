@@ -636,7 +636,6 @@ public class GameCore : MonoBehaviour
                 {
                     WriteLog("Not switching turn to Player");
                     bot.MakeTurn();
-                    TurnSwitch();
                     return;
                 }
                 break;
@@ -646,7 +645,6 @@ public class GameCore : MonoBehaviour
                     WriteLog("Switching turn to Bot");
                     currentTurn = TurnType.TT_Bot;
                     bot.MakeTurn();
-                    TurnSwitch();
                     return;
                 }
                 else
