@@ -19,7 +19,7 @@ public class GameCore : MonoBehaviour
     Player player;
     Bot bot;
     Pile pile;
-    GameObject winText, looseText;
+    GameObject winText, looseText, helpText;
     MenuButtons menu;
     TurnType currentTurn = TurnType.TT_Player;
 
@@ -38,14 +38,15 @@ public class GameCore : MonoBehaviour
     {
         winText = GameObject.Find("WinText");
         looseText = GameObject.Find("LooseText");
+        helpText = GameObject.Find("HelpText");
         mainCamera = GameObject.Find("3D Camera");
         pile = GameObject.Find("Pile").GetComponent<Pile>();
         menu = GameObject.Find("MenuPanel").GetComponent<MenuButtons>();
         mainCamera.SetActive(true);
         winText.SetActive(false);
         looseText.SetActive(false);
+        helpText.SetActive(false);
         isGameOnPause = false;
-
         StoneEffect stonePrefab = Resources.Load<StoneEffect>("Domino/Prefab/StoneEffect");
         stoneEffect = StoneEffect.Instantiate(stonePrefab);
         stoneEffect.transform.localScale = new Vector3(1, 1, 0);
@@ -81,12 +82,22 @@ public class GameCore : MonoBehaviour
     }
     public void StartGame()
     {
+        isEndGameCondition = false;
+        for (int i = 0; i < fieldHeight; i++)
+        {
+            for (int j = 0; j < fieldWidth; j++)
+            {
+                field[i, j, 0] = -1;
+                field[i, j, 1] = 0;
+            }
+        }
         stonesPile.GeneratePile();
         for (int i = 0; i < 7; i++)
         {
             player.PickStone();
             bot.PickStone();
         }
+        helpText.SetActive(true);
         StartCoroutine(MakeFirstMove());
     }
     IEnumerator MakeFirstMove()
@@ -585,6 +596,7 @@ public class GameCore : MonoBehaviour
         }
         winText.SetActive(false);
         looseText.SetActive(false);
+        helpText.SetActive(false);
         isGameGoing = false;
         menu.GoMenu();
     }
@@ -789,6 +801,51 @@ public class GameCore : MonoBehaviour
             field[i2, j2, 0] = stone.Values().secondValue;
         }
     }
+    
+    void _HandleDraggesStoneCheck()
+    {
+        int i1 = -1, i2 = -1, j1 = -1, j2 = -1;
+        var halfsPositions = draggedStone.HalfsPositions(); //определение позиции кости относительно сетки
+        for (int i = 0; i < fieldHeight; i++)
+        {
+            for (int j = 0; j < fieldWidth; j++)
+            {
+                if (fieldBlocks[i, j].bounds.Contains(halfsPositions.firstHalfPos) && field[i, j, 0] == -1)
+                {
+                    i1 = i;
+                    j1 = j;
+                }
+                if (fieldBlocks[i, j].bounds.Contains(halfsPositions.secondHalfPos) && field[i, j, 0] == -1)
+                {
+                    i2 = i;
+                    j2 = j;
+                }
+            }
+        }
+        var checkResult = IfCanBePlaced(i1, j1, draggedStone.Values().firstValue, i2, j2, draggedStone.Values().secondValue); //проверка на возможность расположения кости
+        if (checkResult.canBePlaced) //если можно, то отображаем подсветку
+        {
+            Vector3 placementPosition = CalculateScreenPosition(checkResult.dualPlacement, draggedStone.GetRotationState(), checkResult.connectorPart, i1, j1, i2, j2);
+            stoneEffect.SetRotationState(draggedStone.GetRotationState());
+            stoneEffect.transform.localPosition = placementPosition;
+            stoneEffect.SetEffect(StoneEffect.EffectType.ET_Green);
+        }
+        else
+        {
+            stoneEffect.SetEffect(StoneEffect.EffectType.ET_Transparent); // в противном случае глушим подсветку
+        }
+        if (!draggedStone.IsBeingDragged()) //если кость перестали тащить и его можно расположить, то ставим его на поле
+        {
+            if (checkResult.canBePlaced && currentTurn == TurnType.TT_Player)
+            {
+                player.DropStone(draggedStone);
+                PlaceStone(draggedStone, checkResult.dualPlacement, checkResult.connectorPart, checkResult.anchor, i1, j1, i2, j2);
+                TurnSwitch();
+            }
+            draggedStone = null;
+            stoneBeingDragged = false;
+        }
+    }
     void Update()
     {
         if (isGameOnPause)
@@ -819,47 +876,7 @@ public class GameCore : MonoBehaviour
         }
         if (stoneBeingDragged)
         {
-            int i1 = -1, i2 = -1, j1 = -1, j2 = -1;
-            var halfsPositions = draggedStone.HalfsPositions(); //определение позиции кости относительно сетки
-            for (int i = 0; i < fieldHeight; i++)
-            {
-                for (int j = 0; j < fieldWidth; j++)
-                {
-                    if (fieldBlocks[i, j].bounds.Contains(halfsPositions.firstHalfPos) && field[i, j, 0] == -1)
-                    {
-                        i1 = i;
-                        j1 = j;
-                    }
-                    if (fieldBlocks[i, j].bounds.Contains(halfsPositions.secondHalfPos) && field[i, j, 0] == -1)
-                    {
-                        i2 = i;
-                        j2 = j;
-                    }
-                }
-            }
-            var checkResult = IfCanBePlaced(i1, j1, draggedStone.Values().firstValue, i2, j2, draggedStone.Values().secondValue); //проверка на возможность расположения кости
-            if (checkResult.canBePlaced) //если можно, то отображаем подсветку
-            {
-                Vector3 placementPosition = CalculateScreenPosition(checkResult.dualPlacement, draggedStone.GetRotationState(), checkResult.connectorPart, i1, j1, i2, j2);
-                stoneEffect.SetRotationState(draggedStone.GetRotationState());
-                stoneEffect.transform.localPosition = placementPosition;
-                stoneEffect.SetEffect(StoneEffect.EffectType.ET_Green);
-            }
-            else
-            {
-                stoneEffect.SetEffect(StoneEffect.EffectType.ET_Transparent); // в противном случае глушим подсветку
-            }
-            if (!draggedStone.IsBeingDragged()) //если кость перестали тащить и его можно расположить, то ставим его на поле
-            {
-                if (checkResult.canBePlaced && currentTurn == TurnType.TT_Player)
-                {
-                    player.DropStone(draggedStone);
-                    PlaceStone(draggedStone, checkResult.dualPlacement, checkResult.connectorPart, checkResult.anchor, i1, j1, i2, j2);
-                    TurnSwitch();
-                }
-                draggedStone = null;
-                stoneBeingDragged = false;
-            }
+            _HandleDraggesStoneCheck();
         }
     }
 }
